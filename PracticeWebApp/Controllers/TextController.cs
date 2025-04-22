@@ -34,6 +34,5 @@ namespace PracticeWebApp.Controllers
             }
             return Ok(result.ToString());
         }
-        //task
     }
 }
