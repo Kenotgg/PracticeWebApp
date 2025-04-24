@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PracticeWebApp.Services;
+using PracticeWebApp.Services.Interfaces;
 using System.Text;
 
 namespace PracticeWebApp.Controllers
@@ -8,31 +10,24 @@ namespace PracticeWebApp.Controllers
     [ApiController]
     public class TextController : ControllerBase
     {
+        ITextService _textService;
+        public TextController(ITextService textService) 
+        {
+            _textService = textService;
+        }
+
         [HttpGet("send")]
         public async Task<IActionResult> ReturnProcessedString(string word)
         {
-            StringBuilder result = new StringBuilder();
-            int lenght = word.Length;
-            if (lenght % 2 == 0)
+            (bool isValid, string errorMessage) = _textService.IsWordCorrect(word);
+            if (!isValid) 
             {
-                for (int i = lenght / 2 - 1; i >= 0; i--)
-                {
-                    result.Append(word[i]);
-                }
-                for (int i = lenght - 1; i >= lenght / 2; i--)
-                {
-                    result.Append(word[i]);
-                }
+                return BadRequest(errorMessage);
             }
-            else
-            {
-                for (int i = lenght - 1; i >= 0; i--)
-                {
-                    result.Append(word[i]);
-                }
-                result.Append(word);
-            }
-            return Ok(result.ToString());
+            var processedWord = await _textService.ReturnProcessedString(word);
+            return Ok(processedWord);
         }
+
+       
     }
 }
