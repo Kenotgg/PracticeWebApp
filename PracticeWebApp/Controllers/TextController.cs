@@ -27,7 +27,5 @@ namespace PracticeWebApp.Controllers
             var processedWord = await _textService.ReturnProcessedString(word);
             return Ok(processedWord);
         }
-
-       
     }
 }

@@ -39,38 +39,54 @@ namespace PracticeWebApp.Services
         }
 
 
-       
+
         public (bool, string) IsWordCorrect(string word)
         {
-            List<string> unavalableSymbols = new List<string>();
-           
+            Dictionary<char, int> unavailableSymbolsCount = new Dictionary<char, int>();
+
             for (int i = 0; i < word.Length; i++)
             {
                 if (!englishAlphabet.Contains(word[i]))
                 {
-                    if (word[i] == ' ')
+                    if (unavailableSymbolsCount.ContainsKey(word[i]))
                     {
-                        unavalableSymbols.Add("пробел"); 
-                    }
-                    else if (word[i] == ',')
-                    {
-                        unavalableSymbols.Add("запятая");
-                    }
-                    else if (word[i] == '.')
-                    {
-                        unavalableSymbols.Add("точка");
+                        unavailableSymbolsCount[word[i]]++;//Прибавим значение к int по char.
                     }
                     else
                     {
-                        unavalableSymbols.Add(word[i].ToString()); 
+                        unavailableSymbolsCount[word[i]] = 1;//При первом нахождении делаем значение = 1.
                     }
                 }
             }
+
             string message = string.Empty;
-            if (unavalableSymbols.Count > 0)
+            if (unavailableSymbolsCount.Count > 0)
             {
-                message = "Были введены неподходящие символы: ";
-                message += string.Join(", ", unavalableSymbols);
+                message = "Были введены некорректные символы: ";
+                List<string> symbolCounts = new List<string>();
+                foreach (var pair in unavailableSymbolsCount)
+                {
+                    string symbolDescription;
+                    if (pair.Key == ' ')
+                    {
+                        symbolDescription = $"пробел - {pair.Value} раз";
+                    }
+                    else if (pair.Key == ',')
+                    {
+                        symbolDescription = $"запятая - {pair.Value} раз";
+                    }
+                    else if (pair.Key == '.')
+                    {
+                        symbolDescription = $"точка - {pair.Value} раз";
+                    }
+                    else
+                    {
+                        symbolDescription = $"{pair.Key} - {pair.Value} раз";
+                    }
+                    symbolCounts.Add(symbolDescription);
+                }
+
+                message += string.Join(", ", symbolCounts);
                 message += '.';
                 return (false, message);
             }
@@ -80,5 +96,5 @@ namespace PracticeWebApp.Services
             }
         }
 
-    }
+        }
 }
