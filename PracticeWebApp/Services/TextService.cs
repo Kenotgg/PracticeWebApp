@@ -17,7 +17,7 @@ namespace PracticeWebApp.Services
                 return "Самая длинная подстрока: " + FindLongestVowelSubstring(word.ToString()) + ", " + IsWordCorrect(word).Item2;
             }
 
-            StringBuilder resultMessage = new StringBuilder();
+            
             string processedWord = string.Empty;
             int lenght = word.Length;
             if (lenght % 2 == 0)
@@ -37,10 +37,11 @@ namespace PracticeWebApp.Services
                 {
                     processedWord += word[i];
                 }
-                resultMessage.Append(processedWord);
+                processedWord += word;
             }
+
             List<string> symbolCounts = new List<string>();
-            foreach (var pair in GetSymbolsCountDictionary(resultMessage.ToString(),true))
+            foreach (var pair in GetSymbolsCountDictionary(processedWord,true))
             {
                 string symbolDescription;
                 if (pair.Key == ' ')
@@ -61,16 +62,23 @@ namespace PracticeWebApp.Services
                 }
                 symbolCounts.Add(symbolDescription);
             }
-            string symbolsCountsString = string.Join(", ", symbolCounts);
-            resultMessage.Append("Сколько раз введен каждый символ: ");
-            resultMessage.Append(symbolsCountsString);
-            if(FindLongestVowelSubstring(resultMessage.ToString()).Count() > 0)
+            StringBuilder resultMessage = new StringBuilder();
+            resultMessage.Append("Обработанная строка: ");
+            resultMessage.Append("\n");
+            resultMessage.Append(processedWord + ".");
+            resultMessage.Append("\n");
+            resultMessage.Append("\n");
+            resultMessage.Append("Cколько повторений символов встречается: ");
+            resultMessage.Append("\n");
+            resultMessage.Append(string.Join(", ", symbolCounts) + ".");
+            resultMessage.Append("\n");
+            resultMessage.Append("\n");
+            if (FindLongestVowelSubstring(processedWord.ToString()).Count() > 0)
             {
-                resultMessage.Append(", самая длинная подстрока: ");
-                resultMessage.Append(FindLongestVowelSubstring(resultMessage.ToString()));
+                resultMessage.Append("Cамая длинная подстрока: ");
+                resultMessage.Append("\n");
+                resultMessage.Append(FindLongestVowelSubstring(processedWord.ToString()) + ".");
             }
-           
-            resultMessage.Append(".");
             return resultMessage.ToString();
         }
 
@@ -126,7 +134,7 @@ namespace PracticeWebApp.Services
                     }
                     symbolCounts.Add(symbolDescription);
                 }
-
+                message += "\n";
                 message += string.Join(", ", symbolCounts);
                 message += '.';
                 return (false, message);
@@ -152,7 +160,6 @@ namespace PracticeWebApp.Services
             {
                 for (int end = start; end < word.Length; end++)
                 {
-                    // Используем Substring для C# 6.0 совместимости.
                     string substring = word.Substring(start, end - start + 1);
 
                     if (IsVowel(substring.FirstOrDefault()) && IsVowel(substring.LastOrDefault()))
