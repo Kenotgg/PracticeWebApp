@@ -16,7 +16,7 @@ namespace PracticeWebApp.Services
             {
                 return "Самая длинная подстрока: " + FindLongestVowelSubstring(word.ToString()) + ", " + IsWordCorrect(word).Item2;
             }
-
+            //новый функционал.
             
             string processedWord = string.Empty;
             int lenght = word.Length;
