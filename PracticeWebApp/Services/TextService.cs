@@ -83,10 +83,10 @@ namespace PracticeWebApp.Services
             if (sortAlgorithm == "quickSort" || sortAlgorithm == null) 
             {
                 QuickSortAlgorithm quickSortAlgorithm = new QuickSortAlgorithm();
-                resultMessage.Append("Результат сортировки алгоритмом ");
-                resultMessage.Append("'quickSort':");
+                resultMessage.Append("Результат сортировки алгоритмом 'quickSort':");
                 resultMessage.Append("\n");
                 resultMessage.Append(quickSortAlgorithm.Sort(processedWord));
+                resultMessage.Append(".");
             }
             if(sortAlgorithm == "treeSort") 
             {
@@ -94,6 +94,7 @@ namespace PracticeWebApp.Services
                 resultMessage.Append("Результат сортировки алгоритмом 'treeSort':");
                 resultMessage.Append("\n");
                 resultMessage.Append(treeAlgorithm.Sort(processedWord));
+                resultMessage.Append(".");
             }
             return resultMessage.ToString();
         }
