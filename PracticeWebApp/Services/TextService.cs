@@ -2,14 +2,14 @@
 using PracticeWebApp.Services.Interfaces;
 using System.Linq;
 using System.Text;
-
+using PracticeWebApp.Classes;
 namespace PracticeWebApp.Services
 {
     public class TextService : ITextService
     {
         char[] englishAlphabet = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
         static char[] vowelLetters = new char[] { 'a', 'e', 'i', 'o', 'u', 'y' };
-        public async Task<string> ReturnProcessedString(string word)
+        public async Task<string> ReturnProcessedString(string word, string sortAlgorithm)
         {
             bool isCorrect = IsWordCorrect(word).Item1;
             if (!isCorrect)
@@ -17,7 +17,6 @@ namespace PracticeWebApp.Services
                 return "Самая длинная подстрока: " + FindLongestVowelSubstring(word.ToString()) + ", " + IsWordCorrect(word).Item2;
             }
 
-            
             string processedWord = string.Empty;
             int lenght = word.Length;
             if (lenght % 2 == 0)
@@ -41,7 +40,7 @@ namespace PracticeWebApp.Services
             }
 
             List<string> symbolCounts = new List<string>();
-            foreach (var pair in GetSymbolsCountDictionary(processedWord,true))
+            foreach (var pair in GetSymbolsCountDictionary(processedWord, true))
             {
                 string symbolDescription;
                 if (pair.Key == ' ')
@@ -78,6 +77,23 @@ namespace PracticeWebApp.Services
                 resultMessage.Append("Cамая длинная подстрока: ");
                 resultMessage.Append("\n");
                 resultMessage.Append(FindLongestVowelSubstring(processedWord.ToString()) + ".");
+            }
+            resultMessage.Append("\n");
+            resultMessage.Append("\n");
+            if (sortAlgorithm == "quickSort" || sortAlgorithm == null) 
+            {
+                QuickSortAlgorithm quickSortAlgorithm = new QuickSortAlgorithm();
+                resultMessage.Append("Результат сортировки алгоритмом ");
+                resultMessage.Append("'quickSort':");
+                resultMessage.Append("\n");
+                resultMessage.Append(quickSortAlgorithm.Sort(processedWord));
+            }
+            if(sortAlgorithm == "treeSort") 
+            {
+                TreeSortAlgorithm treeAlgorithm = new TreeSortAlgorithm();
+                resultMessage.Append("Результат сортировки алгоритмом 'treeSort':");
+                resultMessage.Append("\n");
+                resultMessage.Append(treeAlgorithm.Sort(processedWord));
             }
             return resultMessage.ToString();
         }
@@ -146,6 +162,8 @@ namespace PracticeWebApp.Services
 
 
         }
+
+       
 
         private string FindLongestVowelSubstring(string word)
         {
