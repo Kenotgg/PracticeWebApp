@@ -13,7 +13,7 @@ namespace TestProject
         //Тест задания 1:
         //Тестирование поставленных примеров.
         [Test]
-        public void Check_Task_1()
+        public void Check_Transform_Word_By_Default_Examples()
         {
             TextService textService = new TextService();
             //1
@@ -52,8 +52,9 @@ namespace TestProject
 
         //Тест задания 2: 
         //Проверка на вход исключительно английских символов в нижнем регистре.
+
         [Test]
-        public void Check_Task_2() 
+        public void Check_Is_English_Alphabet_Matches_Correct()
         {
             TextService textService = new TextService();
             //1
@@ -74,14 +75,24 @@ namespace TestProject
             //6
             bool res6 = textService.IsWordCorrect("CAPSLOCK").Item1;
             Assert.AreEqual(false, res6);
-
         }
+        [Test]
+        public void Check_Is_Output_Correct()
+        {
+            TextService textService = new TextService();
+            string word = "Елочка";
+            string expectedMessage = "Были введены некорректные символы: \nЕ - 1 раз, л - 1 раз, о - 1 раз, ч - 1 раз, к - 1 раз, а - 1 раз."; // Ожидаемое сообщение
 
+            (bool isCorrect, string actualMessage) result = textService.IsWordCorrect(word);
+
+            Assert.IsFalse(result.isCorrect); // Проверяем, что слово некорректно
+            Assert.AreEqual(expectedMessage, result.actualMessage); // Проверяем, что сообщение об ошибке совпадает с ожидаемым
+        }
 
         //Тест задания 3:
         //Проверяем совпадает ли количество повторений символов.
         [Test]
-        public void Check_Task_3()
+        public void Check_Is_Symbols_Count_Correct()
         {
             TextService textService = new TextService();
             string word = "fffddaaaa";
@@ -98,28 +109,46 @@ namespace TestProject
         //Тест задания 4: 
         //Нахождение самой длинной подстроки начинающейся на гласную букву.
         [Test]
-        public void Check_Task_4() 
+        public void Check_Is_Vowel_Substring_Correct()
         {
             TextService textService = new TextService();
             //1
             string word1 = "baeoiyb";
-            string result1 = textService.FindLongestVowelSubstring(word1);
-            Assert.AreEqual("aeoiy",result1);
+            string result1 = textService.FindLongestVowelSubstring(textService.TransformWord(word1));
+            Assert.AreEqual("yioeabbaeoiy", result1);
             //2
             string word2 = "abcdeiouxyzaeiou";
-            string result2 = textService.FindLongestVowelSubstring(word2);
-            Assert.AreEqual("abcdeiouxyzaeiou", result2); // Должна вернуть "eiouxy" а не "aeiou"
+            string result2 = textService.FindLongestVowelSubstring(textService.TransformWord(word2));
+            Assert.AreEqual("uoiedcbauoieazy", result2); // Должна вернуть "eiouxy" а не "aeiou"
             //3
             string word3 = "aeioubcdefgh";
-            string result3 = textService.FindLongestVowelSubstring(word3);
-            Assert.AreEqual("aeioubcde", result3);
+            string result3 = textService.FindLongestVowelSubstring(textService.TransformWord(word3));
+            Assert.AreEqual("uoieahgfe", result3);
+        }
+
+        [Test]
+        public void Check_Is_Vowel_Substring_Correct_By_Default_Examples()
+        {
+            TextService textService = new TextService();
+            //1
+            string word1 = "a";
+            string result1 = textService.FindLongestVowelSubstring(textService.TransformWord(word1));
+            Assert.AreEqual("aa", result1);
+            //2
+            string word2 = "abcdef";
+            string result2 = textService.FindLongestVowelSubstring(textService.TransformWord(word2));
+            Assert.AreEqual("afe", result2);
+            //3
+            string word3 = "abcde";
+            string result3 = textService.FindLongestVowelSubstring(textService.TransformWord(word3));
+            Assert.AreEqual("edcbaabcde", result3);
         }
 
 
         //Тест задания 5: 
         //Проверка правильной работы быстрой сортировки (Quicksort) и сортировки деревом (Tree sort).
         [Test]
-        public void Quick_Sort_Test()
+        public void QuickSort_Test()
         {
             QuickSortAlgorithm quickSortAlgorithm = new QuickSortAlgorithm();
             //1
@@ -138,7 +167,7 @@ namespace TestProject
 
 
         [Test]
-        public void Tree_Sort_Test()
+        public void TreeSort_Test()
         {
             TreeSortAlgorithm treeSortAlgorithm = new TreeSortAlgorithm();
             //1

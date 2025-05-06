@@ -159,46 +159,44 @@ namespace PracticeWebApp.Services
         {
             Dictionary<char, int> unavailableSymbolsCount = GetSymbolsCountDictionaryByLanguage(word, false);
 
-            string message = string.Empty;
             if (unavailableSymbolsCount.Count > 0)
             {
-                message = "Были введены некорректные символы: ";
-                List<string> symbolCounts = new List<string>();
-                foreach (var pair in unavailableSymbolsCount)
-                {
-                    string symbolDescription;
-                    if (pair.Key == ' ')
-                    {
-                        symbolDescription = $"пробел - {pair.Value} раз";
-                    }
-                    else if (pair.Key == ',')
-                    {
-                        symbolDescription = $"запятая - {pair.Value} раз";
-                    }
-                    else if (pair.Key == '.')
-                    {
-                        symbolDescription = $"точка - {pair.Value} раз";
-                    }
-                    else
-                    {
-                        symbolDescription = $"{pair.Key} - {pair.Value} раз";
-                    }
-                    symbolCounts.Add(symbolDescription);
-                }
-                message += "\n";
-                message += string.Join(", ", symbolCounts);
-                message += '.';
+                string message = GenerateErrorMessage(unavailableSymbolsCount);
                 return (false, message);
             }
             else
             {
-                return (true, message);
+                return (true, string.Empty); 
             }
-
-
         }
 
-       
+        private string GenerateErrorMessage(Dictionary<char, int> unavailableSymbolsCount)
+        {
+            string message = "Были введены некорректные символы: \n";
+            List<string> symbolCounts = new List<string>();
+            foreach (var pair in unavailableSymbolsCount)
+            {
+                string symbolDescription = GetSymbolDescription(pair.Key, pair.Value);
+                symbolCounts.Add(symbolDescription);
+            }
+            message += string.Join(", ", symbolCounts) + ".";
+            return message;
+        }
+
+        public string GetSymbolDescription(char symbol, int count) 
+        {
+            switch (symbol)
+            {
+                case ' ':
+                    return $"пробел - {count} раз";
+                case ',':
+                    return $"запятая - {count} раз";
+                case '.':
+                    return $"точка - {count} раз";
+                default:
+                    return $"{symbol} - {count} раз";
+            }
+        }
 
         public string FindLongestVowelSubstring(string word)
         {
