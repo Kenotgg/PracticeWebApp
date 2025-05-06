@@ -11,6 +11,7 @@ builder.Services.AddSingleton<ITextService,TextService>();
 
 builder.Services.AddTransient<ISortAlgorithm, QuickSortAlgorithm>();
 builder.Services.AddTransient<ISortAlgorithm, TreeSortAlgorithm>();
+builder.Services.AddSingleton<IBlackListSettings, BlackListSettings>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
