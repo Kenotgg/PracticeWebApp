@@ -63,7 +63,7 @@ namespace PracticeWebApp.Services
         private string GetSymbolCountsAsString(string word) 
         {
             List<string> symbolCounts = new List<string>();
-            foreach (var pair in GetSymbolsCountDictionaryFromEngAlphabet(word, true))
+            foreach (var pair in GetSymbolsCountDictionaryByLanguage(word, true))
             {
                 string symbolDescription;
                 if (pair.Key == ' ')
@@ -113,30 +113,51 @@ namespace PracticeWebApp.Services
             return processedWord;
         }
 
-        public Dictionary<char,int> GetSymbolsCountDictionaryFromEngAlphabet(string word, bool containsEnglishAlpabet) 
+        public Dictionary<char,int> GetSymbolsCountDictionaryByLanguage(string word, bool checkEnglishSymbols) 
         {
             Dictionary<char, int> symbolsCount = new Dictionary<char, int>();
-            for (int i = 0; i < word.Length; i++)
+            if (checkEnglishSymbols) 
             {
-
-                if (englishAlphabet.Contains(word[i]) == containsEnglishAlpabet)
+                for (int i = 0; i < word.Length; i++)
                 {
-                    if (symbolsCount.ContainsKey(word[i]))
+                    if (englishAlphabet.Contains(word[i]) == true)
                     {
-                        symbolsCount[word[i]]++;//Прибавим значение к int по char.
-                    }
-                    else
-                    {
-                        symbolsCount[word[i]] = 1;//При первом нахождении делаем значение = 1.
+                        if (symbolsCount.ContainsKey(word[i]))
+                        {
+                            symbolsCount[word[i]]++;//Прибавим значение к int по char.
+                        }
+                        else
+                        {
+                            symbolsCount[word[i]] = 1;//При первом нахождении делаем значение = 1.
+                        }
                     }
                 }
+                return symbolsCount;
             }
-            return symbolsCount;
+            else 
+            {
+                for (int i = 0; i < word.Length; i++)
+                {
+                    if (englishAlphabet.Contains(word[i]) == false)
+                    {
+                        if (symbolsCount.ContainsKey(word[i]))
+                        {
+                            symbolsCount[word[i]]++;//Прибавим значение к int по char.
+                        }
+                        else
+                        {
+                            symbolsCount[word[i]] = 1;//При первом нахождении делаем значение = 1.
+                        }
+                    }
+                }
+                return symbolsCount;
+            }
+           
         }
         
         public (bool, string) IsWordCorrect(string word)
         {
-            Dictionary<char, int> unavailableSymbolsCount = GetSymbolsCountDictionaryFromEngAlphabet(word,false);
+            Dictionary<char, int> unavailableSymbolsCount = GetSymbolsCountDictionaryByLanguage(word, false);
 
             string message = string.Empty;
             if (unavailableSymbolsCount.Count > 0)
@@ -179,7 +200,7 @@ namespace PracticeWebApp.Services
 
        
 
-        private string FindLongestVowelSubstring(string word)
+        public string FindLongestVowelSubstring(string word)
         {
             if (string.IsNullOrEmpty(word))
             {
