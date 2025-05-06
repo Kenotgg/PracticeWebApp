@@ -3,12 +3,25 @@ using PracticeWebApp.Services.Interfaces;
 using System.Linq;
 using System.Text;
 using PracticeWebApp.Classes;
+using PracticeWebApp.Controllers;
+using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Text.Json;
 namespace PracticeWebApp.Services
 {
     public class TextService : ITextService
     {
         char[] englishAlphabet = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
         static char[] vowelLetters = new char[] { 'a', 'e', 'i', 'o', 'u', 'y' };
+        
+        private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger<TextController> _logger;
+
+        public TextService(ILogger<TextController> logger, IHttpClientFactory clientFactory) 
+        {                  
+            _clientFactory = clientFactory;
+            _logger = logger;
+        }
         public async Task<string> ReturnProcessedString(string word, string sortAlgorithm)
         {
             bool isCorrect = IsWordCorrect(word).Item1;
@@ -71,7 +84,6 @@ namespace PracticeWebApp.Services
             resultMessage.Append("\n");
             resultMessage.Append(string.Join(", ", symbolCounts) + ".");
             resultMessage.Append("\n");
-            resultMessage.Append("\n");
             if (FindLongestVowelSubstring(processedWord.ToString()).Count() > 0)
             {
                 resultMessage.Append("Cамая длинная подстрока: ");
@@ -96,9 +108,37 @@ namespace PracticeWebApp.Services
                 resultMessage.Append(treeAlgorithm.Sort(processedWord));
                 resultMessage.Append(".");
             }
+            resultMessage.Append("\n");
+            resultMessage.Append("\n");
+            int? randomNumber = await GetRandomNumberFromApi(0, processedWord.Length);
+            if (randomNumber != null) 
+            {
+                resultMessage.Append("Урезанное слово через 'api': ");
+                resultMessage.Append("\n");
+                resultMessage.Append(RemoveSymbolByNumber(processedWord, randomNumber.Value));
+                resultMessage.Append('.');
+            }
+            else 
+            {
+                Random random = new Random();
+                int randomNumberNet = random.Next(0, processedWord.Length);
+                resultMessage.Append("Урезанное слово через '.net': ");
+                resultMessage.Append("\n");
+                resultMessage.Append(RemoveSymbolByNumber(processedWord, randomNumberNet));
+                resultMessage.Append('.');
+            }
+            
+            
             return resultMessage.ToString();
         }
 
+        
+        public string RemoveSymbolByNumber(string word,int index) 
+        {
+            List<char> charredWord = word.ToCharArray().ToList();
+            charredWord.RemoveAt(index);
+            return new string(charredWord.ToArray());
+        }
 
         private Dictionary<char,int> GetSymbolsCountDictionary(string word, bool containsEnglishAlpabet) 
         {
@@ -120,7 +160,58 @@ namespace PracticeWebApp.Services
             }
             return symbolsCount;
         }
-        
+        public async Task<int?> GetRandomNumberFromApi(int min, int max) 
+        {
+            var client = _clientFactory.CreateClient();
+            string apiUrl = $"https://www.randomnumberapi.com/api/v1.0/random?min={min}&max={max}&count=1";
+            try
+            {
+                if(min < 0) 
+                {
+                    throw new Exception("Нельзя обратиться к отрицательному индексу");
+                }
+                var response = await client.GetAsync(apiUrl);
+                // Проверка успешности запроса
+                if (response.IsSuccessStatusCode)
+                {
+                    // Чтение содержимого ответа как строки
+                    var jsonString = await response.Content.ReadAsStringAsync();
+                    try 
+                    {
+                        var numbers = JsonSerializer.Deserialize<int[]>(jsonString);
+                        if (numbers != null && numbers.Length > 0)
+                        {
+                            int randomNumber = numbers[0];
+                            _logger.LogInformation($"Successfully parsed random number: {randomNumber}");
+                            return randomNumber;
+                        }
+                        else
+                        {
+                            _logger.LogWarning("API returned an empty array.");
+                            return null;
+                        }
+                        
+                    }
+                    catch(JsonException ex) 
+                    {
+                        _logger.LogError($"Error deserializing JSON: {ex.Message}, JSON: {jsonString}");
+                        return null;
+                    }
+                    
+                }
+                else
+                {
+                    _logger.LogError($"API request failed with status code {response.StatusCode}");
+                    return null;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                // Обработка исключений, связанных с запросом
+                _logger.LogWarning($"HTTP request error: {ex.Message}");
+                return null;
+            }
+        }
         public (bool, string) IsWordCorrect(string word)
         {
             Dictionary<char, int> unavailableSymbolsCount = GetSymbolsCountDictionary(word,false);
@@ -164,8 +255,6 @@ namespace PracticeWebApp.Services
 
         }
 
-       
-
         private string FindLongestVowelSubstring(string word)
         {
             if (string.IsNullOrEmpty(word))
@@ -192,6 +281,7 @@ namespace PracticeWebApp.Services
             }
             return longestSubstring;
         }
+
         private bool IsVowel(char c)
         {
             return vowelLetters.Contains(c);
