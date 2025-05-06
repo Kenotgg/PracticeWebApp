@@ -16,11 +16,14 @@ namespace PracticeWebApp.Services
         
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger<TextController> _logger;
-
-        public TextService(ILogger<TextController> logger, IHttpClientFactory clientFactory) 
+        private readonly IConfiguration _configuration;
+        private readonly IBlackListSettings _blackListSettings;
+        public TextService(ILogger<TextController> logger, IHttpClientFactory clientFactory, IConfiguration configuration, IBlackListSettings blackListSettings) 
         {                  
             _clientFactory = clientFactory;
             _logger = logger;
+            _configuration = configuration;
+            _blackListSettings = blackListSettings;
         }
         public async Task<string> ReturnProcessedString(string word, string sortAlgorithm)
         {
@@ -83,10 +86,10 @@ namespace PracticeWebApp.Services
             resultMessage.Append("Cколько повторений символов встречается: ");
             resultMessage.Append("\n");
             resultMessage.Append(string.Join(", ", symbolCounts) + ".");
-            resultMessage.Append("\n");
-            resultMessage.Append("\n");
             if (FindLongestVowelSubstring(processedWord.ToString()).Count() > 0)
             {
+                resultMessage.Append("\n");
+                resultMessage.Append("\n");
                 resultMessage.Append("Cамая длинная подстрока: ");
                 resultMessage.Append("\n");
                 resultMessage.Append(FindLongestVowelSubstring(processedWord.ToString()) + ".");
@@ -164,7 +167,8 @@ namespace PracticeWebApp.Services
         public async Task<int?> GetRandomNumberFromApi(int min, int max) 
         {
             var client = _clientFactory.CreateClient();
-            string apiUrl = $"https://www.randomnumberapi.com/api/v1.0/random?min={min}&max={max}&count=1";
+            string baseUrl = _configuration["RandomApi"];
+            string apiUrl = $"{baseUrl}?min={min}&max={max}&count=1";
             try
             {
                 if(min < 0) 
@@ -215,6 +219,12 @@ namespace PracticeWebApp.Services
         }
         public (bool, string) IsWordCorrect(string word)
         {
+            // Проверяем, находится ли слово в черном списке (игнорируя регистр и пробелы)
+            if (_blackListSettings.Words.Any(blacklistedWord => string.Equals(blacklistedWord.Trim(), word.Trim(), StringComparison.OrdinalIgnoreCase)))
+            {
+                return (false, $"Word '{word}' is blacklisted.");
+            }
+
             Dictionary<char, int> unavailableSymbolsCount = GetSymbolsCountDictionary(word,false);
 
             string message = string.Empty;
