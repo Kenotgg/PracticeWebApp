@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PracticeWebApp.Services;
 using PracticeWebApp.Services.Interfaces;
@@ -10,11 +12,13 @@ namespace PracticeWebApp.Controllers
     [ApiController]
     public class TextController : ControllerBase
     {
+        
         ITextService _textService;
-        public TextController(ITextService textService) 
+        public TextController(ITextService textService, IHttpClientFactory clientFactory, ILogger<TextController> logger) 
         {
             _textService = textService;
-        }
+            
+        } 
 
         [HttpGet("send")]
         public async Task<IActionResult> ReturnProcessedString(string word, string? sortAlgorithm)
@@ -27,5 +31,11 @@ namespace PracticeWebApp.Controllers
             string processedWord = await _textService.ReturnProcessedString(word, sortAlgorithm);
             return Ok(processedWord);
         }
+
+        //[HttpGet("getRandomNumber")]
+        //public async Task<IActionResult> GetRandomNumber() 
+        //{
+            
+        //}
     }  
 }
