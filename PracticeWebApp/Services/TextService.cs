@@ -84,6 +84,7 @@ namespace PracticeWebApp.Services
             resultMessage.Append("\n");
             resultMessage.Append(string.Join(", ", symbolCounts) + ".");
             resultMessage.Append("\n");
+            resultMessage.Append("\n");
             if (FindLongestVowelSubstring(processedWord.ToString()).Count() > 0)
             {
                 resultMessage.Append("Cамая длинная подстрока: ");
@@ -242,7 +243,6 @@ namespace PracticeWebApp.Services
                     }
                     symbolCounts.Add(symbolDescription);
                 }
-                message += "\n";
                 message += string.Join(", ", symbolCounts);
                 message += '.';
                 return (false, message);

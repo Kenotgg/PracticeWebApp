@@ -26,7 +26,7 @@ namespace PracticeWebApp.Controllers
             (bool isValid, string errorMessage) = _textService.IsWordCorrect(word);
             if (!isValid) 
             {
-                return BadRequest(errorMessage);
+                return BadRequest(new { message = "HTTP ошибка 400 Bad Request: " + errorMessage });
             }
             string processedWord = await _textService.ReturnProcessedString(word, sortAlgorithm);
             return Ok(processedWord);
