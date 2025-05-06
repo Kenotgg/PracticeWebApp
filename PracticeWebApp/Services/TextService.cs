@@ -16,7 +16,79 @@ namespace PracticeWebApp.Services
             {
                 return "Самая длинная подстрока: " + FindLongestVowelSubstring(word.ToString()) + ", " + IsWordCorrect(word).Item2;
             }
+            string processedWord = TransformWord(word);
+            return FormatResult(processedWord, sortAlgorithm);
+        }
 
+        private string FormatResult(string processedWord, string sortAlgorithm) 
+        {
+            StringBuilder resultMessage = new StringBuilder();
+            resultMessage.Append("Обработанная строка: ");
+            resultMessage.Append("\n");
+            resultMessage.Append(processedWord + ".");
+            resultMessage.Append("\n");
+            resultMessage.Append("\n");
+            resultMessage.Append("Cколько повторений символов встречается: ");
+            resultMessage.Append("\n");
+            resultMessage.Append(GetSymbolCountsAsString(processedWord));
+            resultMessage.Append("\n");
+            resultMessage.Append("\n");
+            if (FindLongestVowelSubstring(processedWord.ToString()).Count() > 0)
+            {
+                resultMessage.Append("Cамая длинная подстрока: ");
+                resultMessage.Append("\n");
+                resultMessage.Append(FindLongestVowelSubstring(processedWord.ToString()) + ".");
+            }
+            resultMessage.Append("\n");
+            resultMessage.Append("\n");
+            if (sortAlgorithm == "quickSort" || sortAlgorithm == null)
+            {
+                QuickSortAlgorithm quickSortAlgorithm = new QuickSortAlgorithm();
+                resultMessage.Append("Результат сортировки алгоритмом 'quickSort':");
+                resultMessage.Append("\n");
+                resultMessage.Append(quickSortAlgorithm.Sort(processedWord));
+                resultMessage.Append(".");
+            }
+            if (sortAlgorithm == "treeSort")
+            {
+                TreeSortAlgorithm treeAlgorithm = new TreeSortAlgorithm();
+                resultMessage.Append("Результат сортировки алгоритмом 'treeSort':");
+                resultMessage.Append("\n");
+                resultMessage.Append(treeAlgorithm.Sort(processedWord));
+                resultMessage.Append(".");
+            }
+            return resultMessage.ToString();
+        }
+
+        private string GetSymbolCountsAsString(string word) 
+        {
+            List<string> symbolCounts = new List<string>();
+            foreach (var pair in GetSymbolsCountDictionaryFromEngAlphabet(word, true))
+            {
+                string symbolDescription;
+                if (pair.Key == ' ')
+                {
+                    symbolDescription = $"пробел - {pair.Value} раз";
+                }
+                else if (pair.Key == ',')
+                {
+                    symbolDescription = $"запятая - {pair.Value} раз";
+                }
+                else if (pair.Key == '.')
+                {
+                    symbolDescription = $"точка - {pair.Value} раз";
+                }
+                else
+                {
+                    symbolDescription = $"{pair.Key} - {pair.Value} раз";
+                }
+                symbolCounts.Add(symbolDescription);
+            }
+            return string.Join(", ", symbolCounts) + ".";
+        }
+
+        public string TransformWord(string word) 
+        {
             string processedWord = string.Empty;
             int lenght = word.Length;
             if (lenght % 2 == 0)
@@ -38,69 +110,10 @@ namespace PracticeWebApp.Services
                 }
                 processedWord += word;
             }
-
-            List<string> symbolCounts = new List<string>();
-            foreach (var pair in GetSymbolsCountDictionary(processedWord, true))
-            {
-                string symbolDescription;
-                if (pair.Key == ' ')
-                {
-                    symbolDescription = $"пробел - {pair.Value} раз";
-                }
-                else if (pair.Key == ',')
-                {
-                    symbolDescription = $"запятая - {pair.Value} раз";
-                }
-                else if (pair.Key == '.')
-                {
-                    symbolDescription = $"точка - {pair.Value} раз";
-                }
-                else
-                {
-                    symbolDescription = $"{pair.Key} - {pair.Value} раз";
-                }
-                symbolCounts.Add(symbolDescription);
-            }
-            StringBuilder resultMessage = new StringBuilder();
-            resultMessage.Append("Обработанная строка: ");
-            resultMessage.Append("\n");
-            resultMessage.Append(processedWord + ".");
-            resultMessage.Append("\n");
-            resultMessage.Append("\n");
-            resultMessage.Append("Cколько повторений символов встречается: ");
-            resultMessage.Append("\n");
-            resultMessage.Append(string.Join(", ", symbolCounts) + ".");
-            resultMessage.Append("\n");
-            resultMessage.Append("\n");
-            if (FindLongestVowelSubstring(processedWord.ToString()).Count() > 0)
-            {
-                resultMessage.Append("Cамая длинная подстрока: ");
-                resultMessage.Append("\n");
-                resultMessage.Append(FindLongestVowelSubstring(processedWord.ToString()) + ".");
-            }
-            resultMessage.Append("\n");
-            resultMessage.Append("\n");
-            if (sortAlgorithm == "quickSort" || sortAlgorithm == null) 
-            {
-                QuickSortAlgorithm quickSortAlgorithm = new QuickSortAlgorithm();
-                resultMessage.Append("Результат сортировки алгоритмом 'quickSort':");
-                resultMessage.Append("\n");
-                resultMessage.Append(quickSortAlgorithm.Sort(processedWord));
-                resultMessage.Append(".");
-            }
-            if(sortAlgorithm == "treeSort") 
-            {
-                TreeSortAlgorithm treeAlgorithm = new TreeSortAlgorithm();
-                resultMessage.Append("Результат сортировки алгоритмом 'treeSort':");
-                resultMessage.Append("\n");
-                resultMessage.Append(treeAlgorithm.Sort(processedWord));
-                resultMessage.Append(".");
-            }
-            return resultMessage.ToString();
+            return processedWord;
         }
 
-
-        private Dictionary<char,int> GetSymbolsCountDictionary(string word, bool containsEnglishAlpabet) 
+        public Dictionary<char,int> GetSymbolsCountDictionaryFromEngAlphabet(string word, bool containsEnglishAlpabet) 
         {
             Dictionary<char, int> symbolsCount = new Dictionary<char, int>();
             for (int i = 0; i < word.Length; i++)
@@ -123,7 +136,7 @@ namespace PracticeWebApp.Services
         
         public (bool, string) IsWordCorrect(string word)
         {
-            Dictionary<char, int> unavailableSymbolsCount = GetSymbolsCountDictionary(word,false);
+            Dictionary<char, int> unavailableSymbolsCount = GetSymbolsCountDictionaryFromEngAlphabet(word,false);
 
             string message = string.Empty;
             if (unavailableSymbolsCount.Count > 0)
