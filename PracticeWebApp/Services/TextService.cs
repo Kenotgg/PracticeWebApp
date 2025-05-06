@@ -110,7 +110,7 @@ namespace PracticeWebApp.Services
             }
             resultMessage.Append("\n");
             resultMessage.Append("\n");
-            int? randomNumber = await GetRandomNumberFromApi(0, processedWord.Length);
+            int? randomNumber = await GetRandomNumberFromApi(0, processedWord.Length - 1);
             if (randomNumber != null) 
             {
                 resultMessage.Append("Урезанное слово через 'api': ");
@@ -121,7 +121,7 @@ namespace PracticeWebApp.Services
             else 
             {
                 Random random = new Random();
-                int randomNumberNet = random.Next(0, processedWord.Length);
+                int randomNumberNet = random.Next(0, processedWord.Length - 1);
                 resultMessage.Append("Урезанное слово через '.net': ");
                 resultMessage.Append("\n");
                 resultMessage.Append(RemoveSymbolByNumber(processedWord, randomNumberNet));
@@ -168,7 +168,7 @@ namespace PracticeWebApp.Services
             {
                 if(min < 0) 
                 {
-                    throw new Exception("Нельзя обратиться к отрицательному индексу");
+                    throw new Exception("Нельзя обратиться к отрицательному индексу.");
                 }
                 var response = await client.GetAsync(apiUrl);
                 // Проверка успешности запроса
