@@ -1,5 +1,4 @@
-﻿
-using PracticeWebApp.Services.Interfaces;
+﻿using PracticeWebApp.Services.Interfaces;
 
 namespace PracticeWebApp.Classes
 {

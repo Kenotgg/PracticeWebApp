@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PracticeWebApp.Services.Interfaces;
 using System.Linq;
 using System.Text;
